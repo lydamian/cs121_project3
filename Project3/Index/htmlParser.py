@@ -6,11 +6,8 @@ Created on Nov 15, 2018
 import os
 from bs4 import BeautifulSoup
 from bs4.builder._htmlparser import HTMLPARSER
-# import _Folder
 from nltk.stem.wordnet import WordNetLemmatizer
-from test.test_decimal import directory
 import json
-from test.test_socket import try_address
 from fileinput import close
 #Tam
 # dirPath = "\\Users\\Kato\\eclipse-workspace\\SearchEngine\\WEBPAGES_RAW" 
@@ -291,9 +288,13 @@ def driver():
     f = open("C:\Users\Kelly\Documents\GitHub\cs121_project3\data.txt","w")
     
     p = htmlParser()
-#for folderNum in range(0, self.totalFolder - 2):
+# for folderNum in range(0, self.totalFolder - 2):
     f.write("Term:\t\t\t\tFolder#\tdoc#\tFreq\ttitle\th1\th2\th3\th4\th5\th6\tstrong\tbody")
+    #folderPath = dirPath + "\\" + str(folderNum )
+    #size = self.directorySize(folderPath)
+
     for docNum in range(0,20):
+#         dic = p.parseDoc("0",size)
         dic = p.parseDoc("0",docNum)
         f.write("\n")
         for k,v in dic.items():
@@ -304,6 +305,7 @@ def driver():
                     f.write("\n")
         print "Parse doc", docNum
     f.close()
+    
 
 driver()
 
