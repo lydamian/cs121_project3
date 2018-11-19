@@ -5,12 +5,8 @@ Created on Nov 15, 2018
 '''
 import os
 from bs4 import BeautifulSoup
-from bs4.builder._htmlparser import HTMLPARSER
 from nltk.stem.wordnet import WordNetLemmatizer
-from test.test_decimal import directory
 import json
-from test.test_socket import try_address
-from fileinput import close
 
 
 dirPath = "/Users/Kato/eclipse-workspace/SearchEngine/WEBPAGES_RAW" 
@@ -49,8 +45,8 @@ class WordFrequencyCounter:
         else:
             return False
     def checkDocNumAndFolder(self, dic , docNum, folderNum, term):
-        list = dic[term]
-        for item in list:
+        list1 = dic[term]
+        for item in list1:
             if(item.folderID == folderNum and docNum == item.docID):
                 return item
  
@@ -76,61 +72,63 @@ class WordFrequencyCounter:
                 if not (word == ''):
                     if not self.isKeyInDictionary(dicOfTerm, word):
                         word = self.lemmatizer(word)
-                        key = str(folderNum) + '/' + str(docNum)
                         data = Data(folderNum,docNum)
                         data.url = url
                         if type1 == "title":
                             data.title = 1
                             data.totalFreq = 1
-                            list = []
-                            list.append(data)
-                            dicOfTerm.update({ str(word): list})
+                            list1 = []
+                            list1.append(data)
+                            dicOfTerm.update({ str(word): list1})
                         if type1 == "h1":  
                             data.h1 = 1
                             data.totalFreq = 1
-                            list = []
-                            list.append(data)
-                            dicOfTerm.update({ str(word): list }) 
+                            list1 = []
+                            list1.append(data)
+                            dicOfTerm.update({ str(word): list1 }) 
                         if type1 == "h2":
                             data.h2 = 1
                             data.totalFreq = 1
-                            list = []
-                            list.append(data)
-                            dicOfTerm.update({ str(word): list }) 
+                            list1 = []
+                            list1.append(data)
+                            dicOfTerm.update({ str(word): list1 }) 
                         if type1 == "h3":
                             data.h3 = 1
                             data.totalFreq = 1
-                            list = []
-                            list.append(data)
-                            dicOfTerm.update({ str(word): list }) 
+                            list1 = []
+                            list1.append(data)
+                            dicOfTerm.update({ str(word): list1 }) 
                         if type1 == "h4":
                             data.h4 = 1
                             data.totalFreq = 1
-                            dicOfTerm.update({ str(word): list }) 
+                            data.totalFreq = 1
+                            list1 = []
+                            list1.append(data)
+                            dicOfTerm.update({ str(word): list1 }) 
                         if type1 == "h5":
                             data.h5 = 1
                             data.totalFreq = 1
-                            list = []
-                            list.append(data)
-                            dicOfTerm.update({ str(word): list })
+                            list1 = []
+                            list1.append(data)
+                            dicOfTerm.update({ str(word): list1 })
                         if type1 == "h6":
                             data.h6 = 1
                             data.totalFreq = 1
-                            list = []
-                            list.append(data)
-                            dicOfTerm.update({ str(word): list }) 
+                            list1 = []
+                            list1.append(data)
+                            dicOfTerm.update({ str(word): list1 }) 
                         if type1 == "b":
                             data.strong = 1
                             data.totalFreq = 1
-                            list = []
-                            list.append(data)
-                            dicOfTerm.update({ str(word): list }) 
+                            list1 = []
+                            list1.append(data)
+                            dicOfTerm.update({ str(word): list1 }) 
                         if type1 == "p":
                             data.body = 1
                             data.totalFreq = 1
-                            list = []
-                            list.append(data)
-                            dicOfTerm.update({ str(word): list }) 
+                            list1 = []
+                            list1.append(data)
+                            dicOfTerm.update({ str(word): list1 }) 
                         
                     else:
                         word = self.lemmatizer(word)
