@@ -49,7 +49,6 @@ class WordFrequencyCounter:
         for item in list1:
             if(item.folderID == folderNum and docNum == item.docID):
                 return item
- 
         return None      
         
     def lemmatizer(self, word):
@@ -290,8 +289,6 @@ def driver():
     f.close()
 
 driver()
-
-
 '''
 
 p = htmlParser()
