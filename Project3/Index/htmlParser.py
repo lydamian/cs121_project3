@@ -6,16 +6,21 @@ Created on Nov 15, 2018
 import os
 from bs4 import BeautifulSoup
 from bs4.builder._htmlparser import HTMLPARSER
-import _Folder
+# import _Folder
 from nltk.stem.wordnet import WordNetLemmatizer
 from test.test_decimal import directory
 import json
 from test.test_socket import try_address
 from fileinput import close
+#Tam
+# dirPath = "/Users/Kato/eclipse-workspace/SearchEngine/WEBPAGES_RAW" 
+# bookeepingPath = "/Users/Kato/Downloads/WEBPAGES_RAW/bookkeeping.json"
+
+#Kelly
+dirPath= "/Users/Kelly/Documents/GitHub/cs121_project3/WEBPAGES_CLEAN"
+bookeepingPath = "/Users/Kelly/Documents/GitHub/cs121_project3/WEBPAGES_CLEAN/bookkeeping.json"
 
 
-dirPath = "/Users/Kato/eclipse-workspace/SearchEngine/WEBPAGES_RAW" 
-bookeepingPath = "/Users/Kato/Downloads/WEBPAGES_RAW/bookkeeping.json"
 class Data():
     
     folderID = -1
@@ -243,34 +248,34 @@ class htmlParser():
             try:
                 #search title
                 if not soup.title is None:
-                    self.wordParser.parseString( str(soup.title.contents[0]),self.dicOfTerm,folderNum,docNum,"title",url)
+                    self.wordParser.parseString( str(soup.title.contents),self.dicOfTerm,folderNum,docNum,"title",url)
                 #search h1
                 if not soup.h1 is None:
-                    self.wordParser.parseString( str(soup.h1.contents[0]),self.dicOfTerm,folderNum,docNum,"h1", url)
+                    self.wordParser.parseString( str(soup.h1.contents),self.dicOfTerm,folderNum,docNum,"h1", url)
                 #search h2
                 if not soup.h2 is None:
-                    self.wordParser.parseString( str(soup.h2.contents[0]),self.dicOfTerm,folderNum,docNum,"h2",url)
+                    self.wordParser.parseString( str(soup.h2.contents),self.dicOfTerm,folderNum,docNum,"h2",url)
                 #search h3
                 if not soup.h3 is None:
-                    self.wordParser.parseString( str(soup.h3.contents[0]),self.dicOfTerm,folderNum,docNum,"h3",url)
+                    self.wordParser.parseString( str(soup.h3.contents),self.dicOfTerm,folderNum,docNum,"h3",url)
                 #search h4
                 if not soup.h4 is None:
-                    self.wordParser.parseString( str(soup.h4.contents[0]),self.dicOfTerm,folderNum,docNum,"h4",url)
+                    self.wordParser.parseString( str(soup.h4.contents),self.dicOfTerm,folderNum,docNum,"h4",url)
                 #search h5
                 if not soup.h5 is None:
-                    self.wordParser.parseString( str(soup.h5.contents[0]),self.dicOfTerm,folderNum,docNum,"h5",url)
+                    self.wordParser.parseString( str(soup.h5.contents),self.dicOfTerm,folderNum,docNum,"h5",url)
                 #search h6
                 if not soup.h6 is None:
-                    self.wordParser.parseString( str(soup.h6.contents[0]),self.dicOfTerm,folderNum,docNum,"h6",url)
+                    self.wordParser.parseString( str(soup.h6.contents),self.dicOfTerm,folderNum,docNum,"h6",url)
                 #search bold
                 if not soup.b is None:
-                    self.wordParser.parseString( str(soup.b.contents[0]),self.dicOfTerm,folderNum,docNum,"b", url)
+                    self.wordParser.parseString( str(soup.b.contents),self.dicOfTerm,folderNum,docNum,"b", url)
                 #search strong
                 if not soup.strong is None:
-                    self.wordParser.parseString( str(soup.strong.contents[0]),self.dicOfTerm,folderNum,docNum,"b", url)
+                    self.wordParser.parseString( str(soup.strong.contents),self.dicOfTerm,folderNum,docNum,"b", url)
                 #search pa
                 if not soup.p is None:
-                    self.wordParser.parseString( str(soup.p.contents[0]),self.dicOfTerm,folderNum,docNum,"p",url)
+                    self.wordParser.parseString( str(soup.p.contents),self.dicOfTerm,folderNum,docNum,"p",url)
             except:
                 #dsfsdfds
                 a = 0
@@ -279,7 +284,12 @@ class htmlParser():
 
 
 def driver():
-    f = open("/Users/Kato/eclipse-workspace/SearchEngine/data.txt", "w")
+#Tam
+#     f = open("/Users/Kato/eclipse-workspace/SearchEngine/data.txt", "w")
+
+#Kelly
+    f = open("/Users/Kelly/Documents/GitHub/cs121_project3/data.txt","w")
+    
     p = htmlParser()
 #for folderNum in range(0, self.totalFolder - 2):
     f.write("Term:\t\t\t\tFolder#\tdoc#\tFreq\ttitle\th1\th2\th3\th4\th5\th6\tstrong\tbody")
@@ -295,11 +305,16 @@ def driver():
         print "finished"
     f.close()
 
-#driver()
+driver()
 
 
 p = htmlParser()
-file =  p.openFile("/Users/Kato/eclipse-workspace/SearchEngine/data.txt")
+#Tam
+# file =  p.openFile("/Users/Kato/eclipse-workspace/SearchEngine/data.txt")
+
+#Kelly
+file =  p.openFile("/Users/Kelly/Documents/GitHub/cs121_project3/data.txt")
+
 soup = BeautifulSoup(file, "html.parser")
 
 print soup.findAll("p")
