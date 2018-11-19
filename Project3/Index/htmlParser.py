@@ -305,9 +305,9 @@ def driver():
         print "Parse doc", docNum
     f.close()
 
-# driver()
+driver()
 
-p = htmlParser()
+# p = htmlParser()
 #Tam
 # file =  p.openFile("\\Users\\Kato\\eclipse-workspace\\SearchEngine\\data.txt")
 
