@@ -13,13 +13,12 @@ import json
 from test.test_socket import try_address
 from fileinput import close
 #Tam
-# dirPath = "/Users/Kato/eclipse-workspace/SearchEngine/WEBPAGES_RAW" 
-# bookeepingPath = "/Users/Kato/Downloads/WEBPAGES_RAW/bookkeeping.json"
+# dirPath = "\\Users\\Kato\\eclipse-workspace\\SearchEngine\\WEBPAGES_RAW" 
+# bookeepingPath = "\\Users\\Kato\\Downloads\\WEBPAGES_RAW\\bookkeeping.json"
 
 #Kelly
-dirPath= "/Users/Kelly/Documents/GitHub/cs121_project3/WEBPAGES_CLEAN"
-bookeepingPath = "/Users/Kelly/Documents/GitHub/cs121_project3/WEBPAGES_CLEAN/bookkeeping.json"
-
+dirPath= "\\Users\\Kelly\\Documents\\GitHub\\cs121_project3\\WEBPAGES_RAW"
+bookeepingPath = "\\Users\\Kelly\\Documents\\GitHub\\cs121_project3\\WEBPAGES_RAW\\bookkeeping.json"
 
 class Data():
     
@@ -81,7 +80,7 @@ class WordFrequencyCounter:
                 if not (word == ''):
                     if not self.isKeyInDictionary(dicOfTerm, word):
                         word = self.lemmatizer(word)
-                        key = str(folderNum) + '/' + str(docNum)
+                        key = str(folderNum) + '\\' + str(docNum)
                         data = Data(folderNum,docNum)
                         data.url = url
                         if type1 == "title":
@@ -237,16 +236,17 @@ class htmlParser():
     def parseDoc(self, folderNum, docNum):
         # Pass in the folder you want to read
             bookeeping  = self.readBookKeeping()
-            folderPath = dirPath + "/" + str(folderNum )
+            folderPath = dirPath + "\\" + str(folderNum )
             size = self.directorySize(folderPath)
 
-            docPath =  str(folderPath) + '/' + str(docNum)
+            docPath =  str(folderPath) + '\\' + str(docNum)
             htmlDoc = self.openFile(docPath)
             soup = BeautifulSoup(htmlDoc,"html.parser")
             key = str(folderNum) + '/' + str(docNum)
             url = str(bookeeping.get(key))
             try:
                 #search title
+                la = soup.title
                 if not soup.title is None:
                     self.wordParser.parseString( str(soup.title.contents),self.dicOfTerm,folderNum,docNum,"title",url)
                 #search h1
@@ -285,10 +285,10 @@ class htmlParser():
 
 def driver():
 #Tam
-#     f = open("/Users/Kato/eclipse-workspace/SearchEngine/data.txt", "w")
+#     f = open("\\Users\\Kato\\eclipse-workspace\\SearchEngine\\data.txt", "w")
 
 #Kelly
-    f = open("/Users/Kelly/Documents/GitHub/cs121_project3/data.txt","w")
+    f = open("C:\Users\Kelly\Documents\GitHub\cs121_project3\data.txt","w")
     
     p = htmlParser()
 #for folderNum in range(0, self.totalFolder - 2):
@@ -302,30 +302,30 @@ def driver():
                         a =0
                     f.write("%s\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (k,v1.folderID,v1.docID,v1.totalFreq,v1.title,v1.h1,v1.h2,v1.h3,v1.h4,v1.h5,v1.h6,v1.strong,v1.body))
                     f.write("\n")
-        print "finished"
+        print "Parse doc", docNum
     f.close()
 
-driver()
-
+# driver()
 
 p = htmlParser()
 #Tam
-# file =  p.openFile("/Users/Kato/eclipse-workspace/SearchEngine/data.txt")
+# file =  p.openFile("\\Users\\Kato\\eclipse-workspace\\SearchEngine\\data.txt")
 
-#Kelly
-file =  p.openFile("/Users/Kelly/Documents/GitHub/cs121_project3/data.txt")
-
-soup = BeautifulSoup(file, "html.parser")
-
-print soup.findAll("p")
-
-'''
-print soup.title
-print soup.h1
-print soup.h2
-print soup.h3
-print soup.h4
-print soup.h5
-print soup.h6
-print soup.b
-'''
+# # Kelly
+# file =  p.openFile("\\Users\\Kelly\\Documents\\GitHub\\cs121_project3\\WEBPAGES_RAW\\0\\1")
+#  
+# soup = BeautifulSoup(file, "html.parser")
+#    
+# print soup.findAll("p")
+# 
+# # '''
+# print soup.title
+# print soup.h1
+# print soup.h2
+# print soup.h3
+# print soup.h4
+# print soup.h5
+# print soup.h6
+# print soup.b
+# print soup.p
+# '''
