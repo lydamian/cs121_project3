@@ -32,15 +32,6 @@ def querySubmitCallback():
     for doc in docs:
         print doc
     
-    
-    
-    
-    
-    
-    #use this query to retrieve information in database/rank
-    
-    #return to the gui a list of top 10 results, with pagination?
-    
 top = tk.Tk()
 top.geometry('250x100')
 query = StringVar()
