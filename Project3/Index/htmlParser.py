@@ -296,23 +296,25 @@ def driver():
 # for folderNum in range(0, self.totalFolder - 2):
     f.write("Term:\tFolder#\tdoc#\tFreq\ttitle\th1\th2\th3\th4\th5\th6\tstrong\tbody\turl\t")
 #     folderPath = dirPath + "\\" + str(folderNum )
-    folderPath = dirPath + "\\" + str(0)
-    size = htmlParser.directorySize(p,folderPath)
+#     folderPath = dirPath + "\\" + str(1)
+#     size = htmlParser.directorySize(p,folderPath)
 
     ##inserts lines from file into document inside DB called searchEngine
     client = MongoClient()
     db = client.searchEngine
     dictFile = db.dictFile
     
-    for docNum in range(0,10):        
-        dic = p.parseDoc("0",docNum)
+    for docNum in range(0,500):        
+        dic = p.parseDoc("0",docNum) #change folder number to parse all documents inside
         f.write("\n")
         for k,v in dic.items():
-            for v1 in v:  
-                if v1.docID == 300 or v1.docID == 112 or v1.docID == 300 or v1.docID == 112:
-                    a =0
+            for v1 in v:
                 f.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (k,v1.folderID,v1.docID,v1.totalFreq,v1.title,v1.h1,v1.h2,v1.h3,v1.h4,v1.h5,v1.h6,v1.strong,v1.body,v1.url))
                 f.write("\t\n")
+                try:
+                    if len(v1.url)>300:
+                        v1.url = None
+                except: print "could not get url of folderID " + str(v1.folderID) + ", docID" + str(v1.docID)
                 try:
                     doc = {
                     "term": k, 
@@ -332,8 +334,6 @@ def driver():
                     dictFile.insert(doc)
                     print k
                 except IndexError as ie: print "IndexError:",ie
-                
-                
 #         print "Parse doc", docNum
     f.close()
 
