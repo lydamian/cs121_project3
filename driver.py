@@ -22,9 +22,9 @@ class driver:
             self.collectionList.append(d)
             self.collectionSize = self.collectionSize + 1
             #folder/file, associated url
-            print(d, data[d])
+#             print(d, data[d])
         
-        for root, dirs, files in os.walk("./WEBPAGES_CLEAN"):
+        for root, dirs, files in os.walk("./WEBPAGES_RAW"):
             for name in files:
                 doc = os.path.join(root, name)
 #                 print(doc)
@@ -46,7 +46,7 @@ class driver:
 
 
 if __name__ == "__main__":
-    x = driver("WEBPAGES_CLEAN/bookkeeping.json")
+    x = driver("WEBPAGES_RAW/bookkeeping.json")
     
 #         index = x.createIndex()
 #         x.writeIndexFile(...)
