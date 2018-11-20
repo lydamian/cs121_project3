@@ -14,7 +14,7 @@ def cosine_score():
 def querySubmitCallback():
     query = E1.get()
     print query
-    
+
     # connection to database
     try:
         client = MongoClient()
@@ -25,12 +25,13 @@ def querySubmitCallback():
     
     db = client.pymongo_test # replace pymongo with database name
     
-    col = db.col # replace doc with collection name
+    coll = db.col # replace doc with collection name
     
-    docs = col.find({'term': query})
+    results = coll.find({'term': query})
     
-    for doc in docs:
+    for doc in results:
         print doc
+        
     
 top = tk.Tk()
 top.geometry('250x100')
