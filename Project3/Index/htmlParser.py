@@ -13,6 +13,7 @@ from importlib_metadata._hooks import FileNotFoundError
 from nltk.parse.chart import AbstractChartRule
 from pymongo import MongoClient
 import re
+from numpy.lib.utils import _dictlist
 #Tam
 # dirPath = "\\Users\\Kato\\eclipse-workspace\\SearchEngine\\WEBPAGES_RAW" 
 # bookeepingPath = "\\Users\\Kato\\Downloads\\WEBPAGES_RAW\\bookkeeping.json"
@@ -293,70 +294,48 @@ def driver():
     
     p = htmlParser()
 # for folderNum in range(0, self.totalFolder - 2):
-    f.write("Term:\t\t\t\tFolder#\tdoc#\tFreq\ttitle\th1\th2\th3\th4\th5\th6\tstrong\tbody\turl")
+    f.write("Term:\tFolder#\tdoc#\tFreq\ttitle\th1\th2\th3\th4\th5\th6\tstrong\tbody\turl\t")
 #     folderPath = dirPath + "\\" + str(folderNum )
     folderPath = dirPath + "\\" + str(0)
     size = htmlParser.directorySize(p,folderPath)
 
-    for docNum in range(0,10):        
-#         dic = p.parseDoc("0",size)
-        dic = p.parseDoc("0",docNum)
-        f.write("\n")
-        for k,v in dic.items():
-            
-            for v1 in v:  
-                if v1.docID == 300 or v1.docID == 112 or v1.docID == 300 or v1.docID == 112:
-                    a =0
-                f.write("%s\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (k,v1.folderID,v1.docID,v1.totalFreq,v1.title,v1.h1,v1.h2,v1.h3,v1.h4,v1.h5,v1.h6,v1.strong,v1.body,v1.url))
-                f.write("\t\n")
-                
-    ##inserts file being written into document into DB called searchEngine
+    ##inserts lines from file into document inside DB called searchEngine
     client = MongoClient()
     db = client.searchEngine
     dictFile = db.dictFile
     
-    with (open('C:\Users\Kelly\Documents\GitHub\cs121_project3\data.txt')) as f2: #open filepaths
-#                     for i in range(0,docNum): #docNum from htmlParser
-       
-        dictList= f2.read()
-#                         for line in dictList:
-#                             line.split("\t")
-        print dictList
-        try:
-            doc = {
-            "term": str(dictList[0]), # was "data.txt"
-#                             "folderIDslashDocID":str(str(dictList[1])+"/"+str(dictList[2])),
-            "folderID": str(dictList[1]),
-            "tf":dictList[3],
-            "title":dictList[4],
-            "h1":dictList[5],
-            "h2":dictList[6],
-            "h3":dictList[7],
-            "h4":dictList[8],
-            "h5":dictList[9],
-            "h6":dictList[10],
-            "strong":dictList[11],
-            "body":dictList[12],
-            "url":dictList[13] }
-            dictFile.insert(doc)
-        except IndexError as ie: print "IndexError:",ie
-                #k,v1.folderID,v1.docID,v1.totalFreq,v1.title,v1.h1,v1.h2,v1.h3,v1.h4,v1.h5,v1.h6,v1.strong,v1.body,v1.url)
-    #             "list of values" : line[1:] } #takes the tail of the file line, returning the term info list
+    for docNum in range(0,10):        
+        dic = p.parseDoc("0",docNum)
+        f.write("\n")
+        for k,v in dic.items():
+            for v1 in v:  
+                if v1.docID == 300 or v1.docID == 112 or v1.docID == 300 or v1.docID == 112:
+                    a =0
+                f.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (k,v1.folderID,v1.docID,v1.totalFreq,v1.title,v1.h1,v1.h2,v1.h3,v1.h4,v1.h5,v1.h6,v1.strong,v1.body,v1.url))
+                f.write("\t\n")
+                try:
+                    doc = {
+                    "term": k, 
+                    "folderID": v1.folderID,
+                    "docID": v1.docID,
+                    "tf": v1.totalFreq,
+                    "title": v1.title,
+                    "h1":v1.h1,
+                    "h2":v1.h2,
+                    "h3":v1.h3,
+                    "h4":v1.h4,
+                    "h5":v1.h5,
+                    "h6":v1.h6,
+                    "strong":v1.strong,
+                    "body":v1.body,
+                    "url":v1.url }
+                    dictFile.insert(doc)
+                    print k
+                except IndexError as ie: print "IndexError:",ie
+                
                 
 #         print "Parse doc", docNum
     f.close()
-
-##inserts "dataTxt" document into DB called searchEngine
-# from pymongo import MongoClient
-# client = MongoClient()
-# db = client.searchEngine
-# dataTxt = db.dataTxt
-# f2 = open('C:\Users\Kelly\Documents\GitHub\cs121_project3\data.txt')
-# text = f2.read()
-# doc = {
-# "file_name": "data.txt",
-# "contents" : text }
-# dataTxt.insert(doc)
 
 driver()
 
