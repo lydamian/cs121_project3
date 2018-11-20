@@ -1,10 +1,42 @@
 
 import Tkinter as tk
 from Tkinter import StringVar
+from pymongo import MongoClient
+
+
+
+def cosine_score():
+    print "def cosine_score method called.."
+    
+
 
 # get value from text box and submit to database
 def querySubmitCallback():
-    print E1.get()
+    query = E1.get()
+    print query
+    
+    # connection to database
+    try:
+        client = MongoClient()
+    except:
+        print "error connecting to mongodb"
+    
+    print "Connection Successful"
+    
+    db = client.pymongo_test # replace pymongo with database name
+    
+    col = db.col # replace doc with collection name
+    
+    docs = col.find({'term': query})
+    
+    for doc in docs:
+        print doc
+    
+    
+    
+    
+    
+    
     #use this query to retrieve information in database/rank
     
     #return to the gui a list of top 10 results, with pagination?
@@ -16,7 +48,6 @@ L1 = tk.Label(top, text="SEARCH BAR")
 L1.pack( side = tk.TOP)
 E1 = tk.Entry(top, textvariable = query, bd = 5)
 E1.pack(side = tk.LEFT, fill=tk.X,padx=10)
-
 B1 = tk.Button(top, text="Search", command = querySubmitCallback )
 B1.pack(side = tk.RIGHT, fill=tk.X,padx=10)
 text = tk.Text(top)
