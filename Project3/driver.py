@@ -2,7 +2,7 @@
 import Tkinter as tk
 from Tkinter import StringVar
 from pymongo import MongoClient
-
+import json, ast
 
 
 def cosine_score():
@@ -23,16 +23,20 @@ def querySubmitCallback():
     
     print "Connection Successful"
     
-    db = client.pymongo_test # replace pymongo with database name
-    
-    coll = db.col # replace doc with collection name
-    
-    results = coll.find({'term': query})
+    #Damian
+    #db = client.pymongo_test # replace pymongo with database name
+    #coll = db.col # replace doc with collection name
+    #results = coll.find({'term': query})
+
+    #Kelly
+    db = client.searchEngine # replace pymongo with database nam
+    dictFile = db.dictFile # replace doc with collection name    
+    results = dictFile.find({'term': query})
     
     for doc in results:
         print doc
+        print doc['url']
         
-    
 top = tk.Tk()
 top.geometry('250x100')
 query = StringVar()
