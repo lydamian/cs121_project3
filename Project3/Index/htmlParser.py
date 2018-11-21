@@ -328,17 +328,19 @@ def driver():
     db = client.searchEngine
     dictFile = db.dictFile
     
-    for docNum in range(0,500):        
+    for docNum in range(0,5):        
         dic = p.parseDoc("0",docNum) #change folder number to parse all documents inside
         f.write("\n")
         for k,v in dic.items():
+            
             for v1 in v:
                 f.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (k,v1.folderID,v1.docID,v1.totalFreq,v1.title,v1.h1,v1.h2,v1.h3,v1.h4,v1.h5,v1.h6,v1.strong,v1.body,v1.url))
                 f.write("\t\n")
                 try:
-                    if len(v1.url)>300:
+                    if len(v1.url)>1000:
                         v1.url = None
-                except: print "could not get url of folderID " + str(v1.folderID) + ", docID" + str(v1.docID)
+                except: 
+                    print "url too long: folderID=" + str(v1.folderID) + ", docID=" + str(v1.docID)
                 try:
                     doc = {
                     "term": k, 
@@ -355,13 +357,11 @@ def driver():
                     "strong":v1.strong,
                     "body":v1.body,
                     "url":v1.url }
+                    #TODO: fix database insertion loop
+#                     dictFile.insert(doc)
+#                     print doc['term']
                 except IndexError as ie: print "IndexError:",ie
-            #TODO: check database
-            try: 
-                dictFile.insert(doc)
-                print k
-            except: print"error"
-#         print "Parse doc", docNum
+
     f.close()
 
 driver()
