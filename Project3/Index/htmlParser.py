@@ -318,16 +318,17 @@ def driver():
     
     docList=[]
     
-    for docNum in range(0,5): #change folder number to 500 to parse all documents inside
+    for docNum in range(0,24): #change folder number to 500 to parse all documents inside
         dic = p.parseDoc("0",docNum) 
 
         for k,v in dic.items():
             for v1 in v:
-                try:
-                    if len(v1.url)>1000:
-                        v1.url = None
-                except: 
-                    print "url too long: folderID=" + str(v1.folderID) + ", docID=" + str(v1.docID)
+#                 try:
+#                     if len(v1.url)>1000:
+#                         v1.url = None
+#                 except: 
+#                     print "url too long: folderID=" + str(v1.folderID) + ", docID=" + str(v1.docID)
+
                 try:
                     doc = {
                     "term": k, 
@@ -350,7 +351,9 @@ def driver():
     result = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in docList)]
 
     for j in result:
-        dictFile.insert(j)
+        if len(j['url']) < 1000:
+            dictFile.insert(j)
+        print j['term']
 
 driver()
 
