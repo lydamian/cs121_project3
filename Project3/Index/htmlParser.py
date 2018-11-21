@@ -353,6 +353,9 @@ def driver():
     for j in result:
         if len(j['url']) < 1000:
             dictFile.insert(j)
+        else:
+            j['url'] = ""
+            dictFile.insert(j)
         print j['term']
 
 driver()
