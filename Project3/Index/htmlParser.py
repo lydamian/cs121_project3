@@ -14,7 +14,6 @@ from nltk.parse.chart import AbstractChartRule
 from pymongo import MongoClient
 import re
 from numpy.lib.utils import _dictlist
-from collections import OrderedDict
 #Tam
 # dirPath = "\\Users\\Kato\\eclipse-workspace\\SearchEngine\\WEBPAGES_RAW" 
 # bookeepingPath = "\\Users\\Kato\\Downloads\\WEBPAGES_RAW\\bookkeeping.json"
@@ -318,7 +317,7 @@ def driver():
     
     docList=[]
     
-    for docNum in range(0,24): #change folder number to 500 to parse all documents inside
+    for docNum in range(0,500): #change folder number to 500 to parse all documents inside
         dic = p.parseDoc("0",docNum) 
 
         for k,v in dic.items():
@@ -350,11 +349,15 @@ def driver():
             
     result = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in docList)]
 
+    
+    
     for j in result:
+        urlStr = str(j['url'])[0:1000]
         if len(j['url']) < 1000:
             dictFile.insert(j)
         else:
-            j['url'] = ""
+            j['url'] = urlStr
+#             print j['url'] 
             dictFile.insert(j)
         print j['term']
 
