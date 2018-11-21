@@ -14,6 +14,7 @@ from nltk.parse.chart import AbstractChartRule
 from pymongo import MongoClient
 import re
 from numpy.lib.utils import _dictlist
+from collections import OrderedDict
 #Tam
 # dirPath = "\\Users\\Kato\\eclipse-workspace\\SearchEngine\\WEBPAGES_RAW" 
 # bookeepingPath = "\\Users\\Kato\\Downloads\\WEBPAGES_RAW\\bookkeeping.json"
@@ -307,35 +308,21 @@ class htmlParser():
                 a = 0
             htmlDoc.close()
             return self.dicOfTerm
-
-
+        
 def driver():
-#Tam
-#     f = open("\\Users\\Kato\\eclipse-workspace\\SearchEngine\\data.txt", "w")
-
-#Kelly
-    f = open("C:\Users\Kelly\Documents\GitHub\cs121_project3\data.txt","w")
-    
     p = htmlParser()
-# for folderNum in range(0, self.totalFolder - 2):
-    f.write("Term:\tFolder#\tdoc#\tFreq\ttitle\th1\th2\th3\th4\th5\th6\tstrong\tbody\turl\t")
-#     folderPath = dirPath + "\\" + str(folderNum )
-#     folderPath = dirPath + "\\" + str(1)
-#     size = htmlParser.directorySize(p,folderPath)
-
     ##inserts lines from file into document inside DB called searchEngine
     client = MongoClient()
     db = client.searchEngine
     dictFile = db.dictFile
     
-    for docNum in range(0,5):        
-        dic = p.parseDoc("0",docNum) #change folder number to parse all documents inside
-        f.write("\n")
+    docList=[]
+    
+    for docNum in range(0,5): #change folder number to 500 to parse all documents inside
+        dic = p.parseDoc("0",docNum) 
+
         for k,v in dic.items():
-            
             for v1 in v:
-                f.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (k,v1.folderID,v1.docID,v1.totalFreq,v1.title,v1.h1,v1.h2,v1.h3,v1.h4,v1.h5,v1.h6,v1.strong,v1.body,v1.url))
-                f.write("\t\n")
                 try:
                     if len(v1.url)>1000:
                         v1.url = None
@@ -357,12 +344,13 @@ def driver():
                     "strong":v1.strong,
                     "body":v1.body,
                     "url":v1.url }
-                    #TODO: fix database insertion loop
-#                     dictFile.insert(doc)
-#                     print doc['term']
+                    docList.append(doc)
                 except IndexError as ie: print "IndexError:",ie
+            
+    result = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in docList)]
 
-    f.close()
+    for j in result:
+        dictFile.insert(j)
 
 driver()
 
