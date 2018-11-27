@@ -24,13 +24,17 @@ Database (mongodb) "Schema:
 
 '''
 
-
+# This method calculates tf-idf score for a query
+def get_tf_idf():
+    print "get_tf_idf_query method called..."
+    
 
 
 # This method computes the cosine_score of a two vectors
 # in the vector space model. Most likely this will be 
 # A query vector and a document vector pair.
-def cosine_score(q_vector, d_vector):
+# This method returns top K components of Scores.
+def cosine_score(q_vector):
     print "def cosine_score method called.."
     
     '''
@@ -78,12 +82,25 @@ def querySubmitCallback():
         - query should be represented as a doc
         - each term in the query will have a tf-idf weight
     2. Represent each document as a weighted tf-idf vector
+        - Only retrieve those documents that have at least 1/2 of the query terms?
+        - Only retrieve those documents taht have high tf scores?
     3. Compute the cosine similarity score for the query vector
         and each document vector.
     4. Rank documents with resepect to the query by score.
     5. Return the top K (e.g. K = 10) to the user.
     6. Display the top K in the gui? if you got time lol.
+
     '''
+        
+    #lemmatize query
+    tokenized_query = query.split(" ")
+    # - todo please lematize the query tam.
+        
+    query_weight = get_tf_idf(query)
+    
+    top_results = cosine_score(query_weight)
+    
+    #display top_results in the gui format. 
         
     
 top = tk.Tk()
