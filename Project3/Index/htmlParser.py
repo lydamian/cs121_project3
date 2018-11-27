@@ -9,6 +9,11 @@ from bs4.builder._htmlparser import HTMLPARSER
 from nltk.stem.wordnet import WordNetLemmatizer
 import json
 from fileinput import close
+from importlib_metadata._hooks import FileNotFoundError
+from nltk.parse.chart import AbstractChartRule
+from pymongo import MongoClient
+import re
+from numpy.lib.utils import _dictlist
 #Tam
 # dirPath = "\\Users\\Kato\\eclipse-workspace\\SearchEngine\\WEBPAGES_RAW" 
 # bookeepingPath = "\\Users\\Kato\\Downloads\\WEBPAGES_RAW\\bookkeeping.json"
@@ -139,8 +144,7 @@ class WordFrequencyCounter:
                         if ( data == None):
                             data = Data(folderNum,docNum)
                             data.url = url
-                            #listOfTerm.append(str(word))
-                            data.totalFreq += 1
+                        
                             if type1 == "title":
                                 data.title += 1
                                 #dicOfTerm[word] = data
@@ -167,38 +171,50 @@ class WordFrequencyCounter:
                                 #dicOfTerm[word] = data
                             if type1 == "p":
                                 data.body += 1
-                                #dicOfTerm[word] = data
+                                #dicOfTerm[word] = da
+                            if type1 == "g":
+                                data.totalFreq += 1
                             
                             dicOfTerm[word].append(data)
                         else:
-                            data.totalFreq += 1
                             if type1 == "title":
                                 data.title += 1
+                                data.totalFreq += 1
                                 #dicOfTerm[word] = data
                             if type1 == "h1":
                                 data.h1 += 1
+                                data.totalFreq += 1
                                 #dicOfTerm[word] = data
                             if type1 == "h2":
                                 data.h2 += 1
+                                data.totalFreq += 1
                                 #dicOfTerm[word] = data
                             if type1 == "h3":
                                 data.h3 += 1
+                                data.totalFreq += 1
                                 #dicOfTerm[word] = data
                             if type1 == "h4":
                                 data.h4 += 1
+                                data.totalFreq += 1
                                 #dicOfTerm[word] = data
                             if type1 == "h5":
                                 data.h5 += 1
+                                data.totalFreq += 1
                                 #dicOfTerm[word] = data
                             if type1 == "h6":
                                 data.h6 += 1
+                                data.totalFreq += 1
                                 #dicOfTerm[word] = data
                             if type1 == "b":
                                 data.strong += 1
+                                data.totalFreq += 1
                                 #dicOfTerm[word] = data
                             if type1 == "p":
                                 data.body += 1
+                                data.totalFreq += 1
                                 #dicOfTerm[word] = data
+                            if type1 == "g":
+                                data.totalFreq += 1
                         
                 word=''
 
@@ -245,67 +261,105 @@ class htmlParser():
                 #search title
                 la = soup.title
                 if not soup.title is None:
-                    self.wordParser.parseString( str(soup.title.contents),self.dicOfTerm,folderNum,docNum,"title",url)
+                    for text in soup.findAll("title"):
+                        self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"title",url)
                 #search h1
                 if not soup.h1 is None:
-                    self.wordParser.parseString( str(soup.h1.contents),self.dicOfTerm,folderNum,docNum,"h1", url)
+                    for text in soup.findAll("h1"):
+                        self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"h1", url)
                 #search h2
                 if not soup.h2 is None:
-                    self.wordParser.parseString( str(soup.h2.contents),self.dicOfTerm,folderNum,docNum,"h2",url)
+                    for text in soup.findAll("h2"):
+                        self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"h2",url)
                 #search h3
                 if not soup.h3 is None:
-                    self.wordParser.parseString( str(soup.h3.contents),self.dicOfTerm,folderNum,docNum,"h3",url)
+                    for text in soup.findAll("h3"):
+                        self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"h3",url)
                 #search h4
                 if not soup.h4 is None:
-                    self.wordParser.parseString( str(soup.h4.contents),self.dicOfTerm,folderNum,docNum,"h4",url)
+                    for text in soup.findAll("h4"):
+                        self.wordParser.parseString(text.text.strip(),self.dicOfTerm,folderNum,docNum,"h4",url)
                 #search h5
                 if not soup.h5 is None:
-                    self.wordParser.parseString( str(soup.h5.contents),self.dicOfTerm,folderNum,docNum,"h5",url)
+                    for text in soup.findAll("h5"):
+                        self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"h5",url)
                 #search h6
                 if not soup.h6 is None:
-                    self.wordParser.parseString( str(soup.h6.contents),self.dicOfTerm,folderNum,docNum,"h6",url)
+                    for text in soup.findAll("h6"):
+                        self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"h6",url)
                 #search bold
                 if not soup.b is None:
-                    self.wordParser.parseString( str(soup.b.contents),self.dicOfTerm,folderNum,docNum,"b", url)
+                    for text in soup.findAll("b"):
+                        self.wordParser.parseString(  text.text.strip(),self.dicOfTerm,folderNum,docNum,"b", url)
                 #search strong
                 if not soup.strong is None:
-                    self.wordParser.parseString( str(soup.strong.contents),self.dicOfTerm,folderNum,docNum,"b", url)
+                    for text in soup.findAll("strong"):
+                        self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"b", url)
                 #search pa
                 if not soup.p is None:
-                    self.wordParser.parseString( str(soup.p.contents),self.dicOfTerm,folderNum,docNum,"p",url)
+                    for text in soup.findAll("p"):
+                        self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"p",url)
+                if not soup.get_text is None:
+                    text = soup.get_text()
+                    self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"g",url)
             except:
                 #dsfsdfds
                 a = 0
             htmlDoc.close()
             return self.dicOfTerm
-
-
+        
 def driver():
-#Tam
-#     f = open("\\Users\\Kato\\eclipse-workspace\\SearchEngine\\data.txt", "w")
-
-#Kelly
-    f = open("C:\Users\Kelly\Documents\GitHub\cs121_project3\data.txt","w")
-    
     p = htmlParser()
-# for folderNum in range(0, self.totalFolder - 2):
-    f.write("Term:\t\t\t\tFolder#\tdoc#\tFreq\ttitle\th1\th2\th3\th4\th5\th6\tstrong\tbody")
-    #folderPath = dirPath + "\\" + str(folderNum )
-    #size = self.directorySize(folderPath)
-
-    for docNum in range(0,20):
-#         dic = p.parseDoc("0",size)
-        dic = p.parseDoc("0",docNum)
-        f.write("\n")
-        for k,v in dic.items():
-                for v1 in v:  
-                    if v1.docID == 300 or v1.docID == 112 or v1.docID == 300 or v1.docID == 112:
-                        a =0
-                    f.write("%s\t\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (k,v1.folderID,v1.docID,v1.totalFreq,v1.title,v1.h1,v1.h2,v1.h3,v1.h4,v1.h5,v1.h6,v1.strong,v1.body))
-                    f.write("\n")
-        print "Parse doc", docNum
-    f.close()
+    ##inserts lines from file into document inside DB called searchEngine
+    client = MongoClient()
+    db = client.searchEngine
+    dictFile = db.dictFile
     
+    docList=[]
+    
+    for docNum in range(0,500): #change folder number to 500 to parse all documents inside
+        dic = p.parseDoc("0",docNum) 
+
+        for k,v in dic.items():
+            for v1 in v:
+#                 try:
+#                     if len(v1.url)>1000:
+#                         v1.url = None
+#                 except: 
+#                     print "url too long: folderID=" + str(v1.folderID) + ", docID=" + str(v1.docID)
+
+                try:
+                    doc = {
+                    "term": k, 
+                    "folderID": v1.folderID,
+                    "docID": v1.docID,
+                    "tf": v1.totalFreq,
+                    "title": v1.title,
+                    "h1":v1.h1,
+                    "h2":v1.h2,
+                    "h3":v1.h3,
+                    "h4":v1.h4,
+                    "h5":v1.h5,
+                    "h6":v1.h6,
+                    "strong":v1.strong,
+                    "body":v1.body,
+                    "url":v1.url }
+                    docList.append(doc)
+                except IndexError as ie: print "IndexError:",ie
+            
+    result = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in docList)]
+
+    
+    
+    for j in result:
+        urlStr = str(j['url'])[0:1000]
+        if len(j['url']) < 1000:
+            dictFile.insert(j)
+        else:
+            j['url'] = urlStr
+#             print j['url'] 
+            dictFile.insert(j)
+        print j['term']
 
 driver()
 
@@ -314,12 +368,12 @@ driver()
 # file =  p.openFile("\\Users\\Kato\\eclipse-workspace\\SearchEngine\\data.txt")
 
 # # Kelly
-# file =  p.openFile("\\Users\\Kelly\\Documents\\GitHub\\cs121_project3\\WEBPAGES_RAW\\0\\1")
-#  
+# p = htmlParser()
+# file =  p.openFile("\\Users\\Kelly\\Documents\\GitHub\\cs121_project3\\WEBPAGES_RAW\\0\\2")
+#   
 # soup = BeautifulSoup(file, "html.parser")
-#    
-# print soup.findAll("p")
-# 
+#     
+# print soup.findAll(text='title') 
 # # '''
 # print soup.title
 # print soup.h1
@@ -330,4 +384,4 @@ driver()
 # print soup.h6
 # print soup.b
 # print soup.p
-# '''
+# # '''

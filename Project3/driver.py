@@ -2,6 +2,7 @@
 import Tkinter as tk
 from Tkinter import StringVar
 from pymongo import MongoClient
+<<<<<<< HEAD
 from nltk.stem import WordNetLemmatizer
 import math
 
@@ -28,6 +29,9 @@ Summary of Tasks to Complete:
 6. Display the top K in the gui? if you got time lol.
 
 '''
+=======
+import json, ast
+>>>>>>> 72f49b1408e2d4cf921480b0e885a3dd82c36c72
 
 '''
 Database (mongodb) "Schema:
@@ -153,6 +157,7 @@ def querySubmitCallback():
     except:
         print "error connecting to mongodb" 
     print "Connection Successful"
+<<<<<<< HEAD
     db = client.pymongo_test # replace pymongo with database name
     coll = db.col # replace doc with collection name
     results = coll.find({'term': query})
@@ -160,6 +165,46 @@ def querySubmitCallback():
         print doc
     '''   
     top_results = get_top_results(10, query)
+=======
+    
+    #Damian
+    #db = client.pymongo_test # replace pymongo with database name
+    #coll = db.col # replace doc with collection name
+    #results = coll.find({'term': query})
+
+    #Kelly
+    db = client.searchEngine # replace pymongo with database nam
+    dictFile = db.dictFile # replace doc with collection name    
+    results = dictFile.find({'term': query})
+    
+    for doc in results:
+        print doc
+        print doc['url']
+        
+    '''
+    Summary of Tasks to Complete: 
+    1. Represent the query as a weighted tf-idf vector
+        - query should be represented as a doc
+        - each term in the query will have a tf-idf weight
+    2. Represent each document as a weighted tf-idf vector
+        - Only retrieve those documents that have at least 1/2 of the query terms?
+        - Only retrieve those documents taht have high tf scores?
+    3. Compute the cosine similarity score for the query vector
+        and each document vector.
+    4. Rank documents with resepect to the query by score.
+    5. Return the top K (e.g. K = 10) to the user.
+    6. Display the top K in the gui? if you got time lol.
+
+    '''
+        
+    #lemmatize query
+    tokenized_query = query.split(" ")
+    # - todo please lematize the query tam.
+        
+    query_weight = get_tf_idf(query)
+    
+    top_results = cosine_score(query_weight)
+>>>>>>> 72f49b1408e2d4cf921480b0e885a3dd82c36c72
     
     top_results = ['doc1','doc2','doc3','doc4','doc5','doc6','doc7','doc8','doc9','doc10']
     #display top_results in the gui format. 
@@ -169,6 +214,8 @@ def querySubmitCallback():
         T.insert(tk.END, i + ". " + doc+"\r\n")
         
     
+=======
+
 top = tk.Tk()
 top.geometry('500x500')
 query = StringVar()
