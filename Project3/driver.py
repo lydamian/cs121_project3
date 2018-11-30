@@ -2,17 +2,23 @@
 import Tkinter as tk
 from Tkinter import StringVar
 from pymongo import MongoClient
-<<<<<<< HEAD
 from nltk.stem import WordNetLemmatizer
 import math
+from pip._vendor.html5lib._ihatexml import letter
+from nltk.corpus import stopwords
 
 NUM_DOCUMENT = 37000
 
 
-class results:
+class Result:
     def __init__(self):
         self.url = ""
         self.cosine_score = 0
+        
+class Query:
+    def __init__(self):
+        self.term = ""
+        self.frequency = 0
         
 '''
 Summary of Tasks to Complete: 
@@ -29,9 +35,6 @@ Summary of Tasks to Complete:
 6. Display the top K in the gui? if you got time lol.
 
 '''
-=======
-import json, ast
->>>>>>> 72f49b1408e2d4cf921480b0e885a3dd82c36c72
 
 '''
 Database (mongodb) "Schema:
@@ -52,9 +55,37 @@ Database (mongodb) "Schema:
     docList.append(doc)
 
 '''
+
+def is_empty(any_structure):
+    if any_structure:
+        print('Structure is not empty.')
+        return False
+    else:
+        print('Structure is empty.')
+        return True
+
+# initializes the query class with each term and its frequency, returns a dictionary of query/freq pairs.
+def init_query_req_obj(query):
+    d = {}
+    for t in query:
+        if t in d:
+            d[t].frequency = d[t].frequency + 1
+        else:
+            s = Query()
+            d[t] = s
+            d[t].term = t;
+            d[t].frequency = d[t].frequency + 1
+            
+    return d
+
+
 # Assuming special case simplification
-def get_tf_idf_term(q):
-    return 1.0
+def get_tf_idf_term(term, q):
+    tf = q.get(term).frequency
+    if(q.get(term) == None):
+        print "strange, got a term that doesnt exist in data structure"
+        return 1
+    return (1+math.log(tf))
 
 # This method calculates tf-idf score for a query
 # [IN] q - a list of query terms.
@@ -64,6 +95,7 @@ def get_tf_idf_term(q):
 # Lets use special case simplification!
 def get_tf_idf_query(q):
     print "get_tf_idf_query method called..."
+    
     weight = 0.0
     for term in q:
         weight += 1.0
@@ -73,11 +105,33 @@ def get_tf_idf_query(q):
     
 
 # This method calculates tf-idf for a document, given q terms.
-# [IN] q - a list of query terms
-# [IN] d - a row of information in db
+# [IN] doc - a document in mongodb database
+# [IN] df - the number of documents a term returned or postings list or length
 # [OUT] return the tf_idf score of document.
-def get_tf_idf(t, d):
+def get_tf_idf(doc, df):
     print "get_tf_idf_query method called..."
+    #tf = doc['tf'] # FIX THIS LATER, HOW TO GET TF FROM A DOC?????
+    total_weight = 0
+    header_weight = 0
+    title_weight = 0
+    normal_weight = 0
+    
+    # get counts of each type
+    header_weight = doc['h1'] + doc['h2'] + doc['h3'] + doc['h4'] + doc['h5'] + doc['h6'] # FIX THIS
+    title_weight = doc['title']
+    normal_weight = doc['tf'] - header_weight - title_weight
+    
+    # convert counts to actual weights
+    header_weight = header_weight * 1.10
+    title_weight = title_weight * 1.20
+    
+    # get total weight
+    total_weight = header_weight + title_weight
+    return total_weight
+    
+    
+    return ((1 + math.log(total_weight)) * math.log((NUM_DOCUMENT/df)))
+    
     
     
 # This method computes the cosine score of two vectors
@@ -86,6 +140,17 @@ def cosine_score(vector1, vector2):
     print "cosine_score called for: " + vector1 + " " + vector2 + "\n"
     return (vector1 * vector2)/(math.sqrt(pow(vector1, 2) + pow(vector2,2)))
     
+# Returns a tokenized word from an untokenized word
+def tokenize_word(word):
+    tokenized_word = ''
+    word = word.lower()
+    
+    for letter in word:
+        if letter.isalnum():
+            tokenized_word += letter
+        
+    return tokenized_word
+
 
 # This method computes the cosine_score of a two vectors
 # in the vector space model. Most likely this will be 
@@ -96,11 +161,17 @@ def cosine_score(vector1, vector2):
 # [OUT] this method returns top 10 results in a list.
 def get_top_results(k, query):
     print "def cosine_score method called.."
+    T.delete('1.0', tk.END)
+    
     # Local variables
     lemmatizer = WordNetLemmatizer()
     Scores = {} # url, cosine_similarity_score
     Length = {}
     postings_list = None
+    stopWords = set(stopwords.words('english'))
+    postings_length = 0
+    top_k = None
+
     
     '''
     Pseudocode
@@ -116,11 +187,31 @@ def get_top_results(k, query):
             do Scores[d] = Scores[d]/Length[d]
             return Top K components of Scores[]
     '''
-    #lemmatize query, remove stop words, remove duplicates, tokenize
+    #lemmatize query, remove stop words, tokenize
     tokenized_query = query.split(" ")
+    filtered_query = []
+    final_query = []
+    
+    #tokenizing
     for term in tokenized_query:
-        lemmatizer.lemmatize(term)
-        print "token: " + term
+        filtered_query.append(tokenize_word(term))
+        
+    #lemmatizing
+    j = 0
+    for term in filtered_query:
+        filtered_query[j] = lemmatizer.lemmatize(term)
+        j = j+1
+        
+    # removing stopwords
+    for term in filtered_query:
+        if term not in stopWords:
+            final_query.append(term)
+    
+    for term in final_query:
+        print term + " "
+        
+    # storing terms inside a dictionary with dictionary
+    query_freq_obj = init_query_req_obj(final_query)
         
     # connection to database
     try:
@@ -134,13 +225,39 @@ def get_top_results(k, query):
     # Compute Scores
     for term in tokenized_query:
         # retrieve postings list for that term and find term weight
-        term_weight = get_tf_idf_term(term)
-        results = coll.find({'term': term}) 
+        term_weight = get_tf_idf_term(term, query_freq_obj)
+        results = coll.find({'term': term})  # DOES THIS RETURN A LIST OF DICTIONARIES?
+        postings_length = results.count()
+        
         for doc in results:
-            weight_of_doc = get_tf_idf(term, doc)
-            Scores[doc['url']] += cosine_score(term_weight, weight_of_doc)
+            doc_weight = get_tf_idf(doc, postings_length)
+            doc_id = doc['folderId'] + "/" + doc['docId']
+            
+            # Add cosine score to the Score dictionary
+            result_obj = Result()
+            result_obj.url = doc['url']
+            result_obj.cosine_score = cosine_score(term_weight, doc_weight)
+            # If this is a new document then add to dictionary, else just update value.
+            if doc_id in Scores:
+                Scores[doc_id].cosine_score = Scores[doc_id].cosine_score + result_obj.cosine_score
+            else:
+                Scores[doc_id] = result_obj
 
-    # Return top K scores
+    # Return top K scores - sort then return top 10.
+    list_score = Scores.items()
+    list_score.sort(key=lambda x: x.count, reverse=True)
+    
+    return ['Jack','John','Food','Icecream']
+    
+    if(is_empty(list_score)):
+        return None
+    
+    i = 0
+    while( i < k):
+        top_k.add(list_score[i])
+        
+    #return top_k
+        
     
 
 
@@ -157,7 +274,6 @@ def querySubmitCallback():
     except:
         print "error connecting to mongodb" 
     print "Connection Successful"
-<<<<<<< HEAD
     db = client.pymongo_test # replace pymongo with database name
     coll = db.col # replace doc with collection name
     results = coll.find({'term': query})
@@ -165,70 +281,34 @@ def querySubmitCallback():
         print doc
     '''   
     top_results = get_top_results(10, query)
-=======
     
-    #Damian
-    #db = client.pymongo_test # replace pymongo with database name
-    #coll = db.col # replace doc with collection name
-    #results = coll.find({'term': query})
-
-    #Kelly
-    db = client.searchEngine # replace pymongo with database nam
-    dictFile = db.dictFile # replace doc with collection name    
-    results = dictFile.find({'term': query})
-    
-    for doc in results:
-        print doc
-        print doc['url']
-        
-    '''
-    Summary of Tasks to Complete: 
-    1. Represent the query as a weighted tf-idf vector
-        - query should be represented as a doc
-        - each term in the query will have a tf-idf weight
-    2. Represent each document as a weighted tf-idf vector
-        - Only retrieve those documents that have at least 1/2 of the query terms?
-        - Only retrieve those documents taht have high tf scores?
-    3. Compute the cosine similarity score for the query vector
-        and each document vector.
-    4. Rank documents with resepect to the query by score.
-    5. Return the top K (e.g. K = 10) to the user.
-    6. Display the top K in the gui? if you got time lol.
-
-    '''
-        
-    #lemmatize query
-    tokenized_query = query.split(" ")
-    # - todo please lematize the query tam.
-        
-    query_weight = get_tf_idf(query)
-    
-    top_results = cosine_score(query_weight)
->>>>>>> 72f49b1408e2d4cf921480b0e885a3dd82c36c72
-    
-    top_results = ['doc1','doc2','doc3','doc4','doc5','doc6','doc7','doc8','doc9','doc10']
+    #top_results = ['doc1','doc2','doc3','doc4','doc5','doc6','doc7','doc8','doc9','doc10']
     #display top_results in the gui format. 
     i = 1
+    if(top_results == None):
+        T.insert(tk.END, 'no results returned')
+        return
+    
     for doc in top_results:
         print doc
-        T.insert(tk.END, i + ". " + doc+"\r\n")
+        T.insert(tk.END, str(i) + ". " + doc+"\r\n")
+        i = i+1
         
     
-=======
-
 top = tk.Tk()
-top.geometry('500x500')
+top.geometry('800x800') # controls the intitial size of gui
 query = StringVar()
-L1 = tk.Label(top, text="SEARCH BAR")
+L1 = tk.Label(top, text="SEARCH BAR") # Search Bar Header Label
 L1.pack( side = tk.TOP)
-E1 = tk.Entry(top, textvariable = query, bd = 5)
-E1.pack(side = tk.LEFT, fill=tk.X,padx=10)
-B1 = tk.Button(top, text="Search", command = querySubmitCallback )
-B1.pack(side = tk.RIGHT, fill=tk.X,padx=10)
+E1 = tk.Entry(top, textvariable = query, bd = 5, width=100) # text-input bar
+E1.pack(side = tk.TOP, fill=tk.X, padx=10)
+B1 = tk.Button(top, text="Search", command = querySubmitCallback ) # Button
+B1.pack(side = tk.TOP,padx=10)
 text = tk.Text(top)
-
-T = tk.Text(top, height=15, width=50)
-T.pack(side = tk.BOTTOM)
+Result_Label = tk.Label(top, text="RESULTS")
+Result_Label.pack(side=tk.TOP, padx=10, pady=10)
+T = tk.Text(top, height=40, width=60)
+T.pack(side = tk.TOP)
 
 
 
