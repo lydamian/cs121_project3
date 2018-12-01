@@ -6,6 +6,7 @@ from nltk.stem import WordNetLemmatizer
 import math
 from pip._vendor.html5lib._ihatexml import letter
 from nltk.corpus import stopwords
+import numpy as np
 
 NUM_DOCUMENT = 37000
 
@@ -14,6 +15,7 @@ class Result:
     def __init__(self):
         self.url = ""
         self.cosine_score = 0
+        self.id = ""
         
 class Query:
     def __init__(self):
@@ -76,16 +78,18 @@ def init_query_req_obj(query):
             d[t].term = t;
             d[t].frequency = d[t].frequency + 1
             
+    #my_list = list(d.values()
     return d
-
 
 # Assuming special case simplification
 def get_tf_idf_term(term, q):
-    tf = q.get(term).frequency
     if(q.get(term) == None):
         print "strange, got a term that doesnt exist in data structure"
         return 1
-    return (1+math.log(tf))
+    
+    tf = q.get(term).frequency
+    
+    return (1+np.log2(tf))
 
 # This method calculates tf-idf score for a query
 # [IN] q - a list of query terms.
@@ -126,18 +130,26 @@ def get_tf_idf(doc, df):
     title_weight = title_weight * 1.20
     
     # get total weight
-    total_weight = header_weight + title_weight
+    total_weight = header_weight + title_weight + normal_weight
     return total_weight
     
     
-    return ((1 + math.log(total_weight)) * math.log((NUM_DOCUMENT/df)))
+    return ((1 + np.log2(total_weight)) * np.log2((NUM_DOCUMENT/df)))
     
     
     
 # This method computes the cosine score of two vectors
 # assuming they are not normalized.
+def convertToList(dic):
+    list1 = []
+    for k,v in dic.items():
+        list1.append(v)
+                     
+    return list1
+
+
 def cosine_score(vector1, vector2):
-    print "cosine_score called for: " + vector1 + " " + vector2 + "\n"
+#     print "cosine_score called for: " + vector1 + " " + vector2 + "\n"
     return (vector1 * vector2)/(math.sqrt(pow(vector1, 2) + pow(vector2,2)))
     
 # Returns a tokenized word from an untokenized word
@@ -170,7 +182,7 @@ def get_top_results(k, query):
     postings_list = None
     stopWords = set(stopwords.words('english'))
     postings_length = 0
-    top_k = None
+    top_k = []
 
     
     '''
@@ -187,6 +199,11 @@ def get_top_results(k, query):
             do Scores[d] = Scores[d]/Length[d]
             return Top K components of Scores[]
     '''
+    new_query = ""
+    for t in query:
+        new_query = new_query + t.lower()
+    query = new_query
+    
     #lemmatize query, remove stop words, tokenize
     tokenized_query = query.split(" ")
     filtered_query = []
@@ -212,6 +229,11 @@ def get_top_results(k, query):
         
     # storing terms inside a dictionary with dictionary
     query_freq_obj = init_query_req_obj(final_query)
+    
+    '''
+    for v in query_freq_obj:
+        print " term: " + v.term + " freq: " +  str(v.frequency)
+    '''
         
     # connection to database
     try:
@@ -219,19 +241,31 @@ def get_top_results(k, query):
     except:
         print "error connecting to mongodb"
     print "Connection Successful"
-    db = client.pymongo_test # replace pymongo with database name
-    coll = db.col # replace doc with collection name           
- 
+#     db = client.pymongo_test # replace pymongo with database name
+#     dictFile = db.col # replace doc with collection name           
+    
+    #Kelly
+    db = client.searchEngine
+    dictFile = db.dictFile
+    
+    '''
+    one_item = dictFile.find({'term':'computer'})
+    one_item = one_item[0]
+    print "oneitem is: " + one_item['term']
+    return one_item['term']
+    '''
+    
     # Compute Scores
     for term in tokenized_query:
+        print "term is: " + term
         # retrieve postings list for that term and find term weight
         term_weight = get_tf_idf_term(term, query_freq_obj)
-        results = coll.find({'term': term})  # DOES THIS RETURN A LIST OF DICTIONARIES?
+        results = dictFile.find({'term': term})  # DOES THIS RETURN A LIST OF DICTIONARIES?
         postings_length = results.count()
         
         for doc in results:
             doc_weight = get_tf_idf(doc, postings_length)
-            doc_id = doc['folderId'] + "/" + doc['docId']
+            doc_id = doc['folderID'] + "/" + str(doc['docID'])
             
             # Add cosine score to the Score dictionary
             result_obj = Result()
@@ -240,25 +274,33 @@ def get_top_results(k, query):
             # If this is a new document then add to dictionary, else just update value.
             if doc_id in Scores:
                 Scores[doc_id].cosine_score = Scores[doc_id].cosine_score + result_obj.cosine_score
+                Length[doc_id] = Length[doc_id] + 1
             else:
                 Scores[doc_id] = result_obj
+                Scores[doc_id].id = doc_id
+                Length[doc_id] = Length[doc_id] = 1
+                
+
+    for k,v in Scores.items():
+        Scores[k].cosine_score = Scores[k].cosine_score/Length[k]
 
     # Return top K scores - sort then return top 10.
-    list_score = Scores.items()
-    list_score.sort(key=lambda x: x.count, reverse=True)
+    list_score = convertToList(Scores)
+    list_score.sort(key=lambda x: x.cosine_score, reverse=True)
     
-    return ['Jack','John','Food','Icecream']
+#     return ['Jack','John','Food','Icecream']
     
     if(is_empty(list_score)):
         return None
     
     i = 0
-    while( i < k):
-        top_k.add(list_score[i])
-        
-    #return top_k
-        
+    k = 10
     
+    while( i < k and i < len(list_score)):
+        top_k.append(list_score[i])
+        i = i + 1
+        
+    return top_k
 
 
 # get value from text box and submit to database
@@ -275,8 +317,8 @@ def querySubmitCallback():
         print "error connecting to mongodb" 
     print "Connection Successful"
     db = client.pymongo_test # replace pymongo with database name
-    coll = db.col # replace doc with collection name
-    results = coll.find({'term': query})
+    dictFile = db.col # replace doc with collection name
+    results = dictFile.find({'term': query})
     for doc in results:
         print doc
     '''   
@@ -289,9 +331,12 @@ def querySubmitCallback():
         T.insert(tk.END, 'no results returned')
         return
     
+    
     for doc in top_results:
-        print doc
-        T.insert(tk.END, str(i) + ". " + doc+"\r\n")
+        print doc.url + " " + str(doc.cosine_score)
+    
+    for doc in top_results:
+        T.insert(tk.END, str(i) + ". " + "doc_id: " + doc.id + "\r\n  " + " url: " + doc.url + "\r\n")
         i = i+1
         
     
@@ -307,7 +352,7 @@ B1.pack(side = tk.TOP,padx=10)
 text = tk.Text(top)
 Result_Label = tk.Label(top, text="RESULTS")
 Result_Label.pack(side=tk.TOP, padx=10, pady=10)
-T = tk.Text(top, height=40, width=60)
+T = tk.Text(top, height=40, width=100)
 T.pack(side = tk.TOP)
 
 
