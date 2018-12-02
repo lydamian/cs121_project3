@@ -73,15 +73,17 @@ class WordFrequencyCounter:
         '''
         word = ''
         line += "."
+        if line is None:
+            return
         for char in line:
             if(char.isalnum()):
                 if(char.isupper()):
-                    char = char.lower();
+                    char = char.lower()
                 word += char
             else:
                 if not (word == ''):
+                    word = self.lemmatizer(word)
                     if not self.isKeyInDictionary(dicOfTerm, word):
-                        word = self.lemmatizer(word)
                         key = str(folderNum) + '\\' + str(docNum)
                         data = Data(folderNum,docNum)
                         data.url = url
@@ -137,6 +139,11 @@ class WordFrequencyCounter:
                             list = []
                             list.append(data)
                             dicOfTerm.update({ str(word): list }) 
+                        if type1 == "g":
+                            data.totalFreq = 1
+                            list1 = []
+                            list1.append(data)
+                            dicOfTerm.update({ str(word): list1 }) 
                         
                     else:
                         word = self.lemmatizer(word)
@@ -144,75 +151,46 @@ class WordFrequencyCounter:
                         if ( data == None):
                             data = Data(folderNum,docNum)
                             data.url = url
-                        
                             if type1 == "title":
                                 data.title += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h1":
                                 data.h1 += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h2":
                                 data.h2 += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h3":
                                 data.h3 += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h4":
                                 data.h4 += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h5":
                                 data.h5 += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h6":
                                 data.h6 += 1
-                                #dicOfTerm[word] = data
                             if type1 == "b":
                                 data.strong += 1
-                                #dicOfTerm[word] = data
                             if type1 == "p":
                                 data.body += 1
-                                #dicOfTerm[word] = da
                             if type1 == "g":
                                 data.totalFreq += 1
-                            
                             dicOfTerm[word].append(data)
                         else:
                             if type1 == "title":
                                 data.title += 1
-                                data.totalFreq += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h1":
                                 data.h1 += 1
-                                data.totalFreq += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h2":
                                 data.h2 += 1
-                                data.totalFreq += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h3":
                                 data.h3 += 1
-                                data.totalFreq += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h4":
                                 data.h4 += 1
-                                data.totalFreq += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h5":
                                 data.h5 += 1
-                                data.totalFreq += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h6":
                                 data.h6 += 1
-                                data.totalFreq += 1
-                                #dicOfTerm[word] = data
                             if type1 == "b":
                                 data.strong += 1
-                                data.totalFreq += 1
-                                #dicOfTerm[word] = data
                             if type1 == "p":
                                 data.body += 1
-                                data.totalFreq += 1
-                                #dicOfTerm[word] = data
                             if type1 == "g":
                                 data.totalFreq += 1
                         
@@ -255,9 +233,14 @@ class htmlParser():
             docPath =  str(folderPath) + '\\' + str(docNum)
             htmlDoc = self.openFile(docPath)
             soup = BeautifulSoup(htmlDoc,"html.parser")
+            for s in soup("script", "style"):
+                s.decompose()
             key = str(folderNum) + '/' + str(docNum)
             url = str(bookeeping.get(key))
             try:
+                if not soup.get_text is None:
+                    text = soup.get_text()
+                    self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"g",url)
                 #search title
                 la = soup.title
                 if not soup.title is None:
@@ -295,13 +278,6 @@ class htmlParser():
                 if not soup.strong is None:
                     for text in soup.findAll("strong"):
                         self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"b", url)
-                #search pa
-                if not soup.p is None:
-                    for text in soup.findAll("p"):
-                        self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"p",url)
-                if not soup.get_text is None:
-                    text = soup.get_text()
-                    self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"g",url)
             except:
                 #dsfsdfds
                 a = 0
