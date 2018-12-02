@@ -234,14 +234,14 @@ class htmlParser():
             docPath =  str(folderPath) + '\\' + str(docNum)
             htmlDoc = self.openFile(docPath)
             soup = BeautifulSoup(htmlDoc,"html.parser")
-            for s in soup("script", "style"):
+            for s in soup(["script","style"]):
                 s.decompose()
             key = str(folderNum) + '/' + str(docNum)
             url = str(bookeeping.get(key))
             try:
-                if not soup.get_text is None:
+                if not soup.get_text() is None:
                     text = soup.get_text()
-                    self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"g",url)
+                    self.wordParser.parseString(text.strip(),self.dicOfTerm,folderNum,docNum,"g",url)
                 #search title
                 la = soup.title
                 if not soup.title is None:
@@ -294,66 +294,58 @@ def driver():
     
     docList=[]
     
-    for docNum in range(0,500): #change folder number to 500 to parse all documents inside
-        dic = p.parseDoc("0",docNum) 
-
-        for k,v in dic.items():
-            for v1 in v:
-                try:
-                    doc = {
-                    "term": k, 
-                    "folderID": v1.folderID,
-                    "docID": v1.docID,
-                    "tf": v1.totalFreq,
-                    "title": v1.title,
-                    "h1":v1.h1,
-                    "h2":v1.h2,
-                    "h3":v1.h3,
-                    "h4":v1.h4,
-                    "h5":v1.h5,
-                    "h6":v1.h6,
-                    "strong":v1.strong,
-                    "body":v1.body,
-                    "url":v1.url }
-                    docList.append(doc)
-                except IndexError as ie: print "IndexError:",ie
-            
-    result = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in docList)]
-
-    
-    
+#     for folderNum in range(0,2): #TODO: change number of folders
+#         for docNum in range(0,5): #TODO: change number of docs in folder
+#             dic = p.parseDoc(str(folderNum),docNum) #folder number is a string
+#      
+#             for k,v in dic.items():
+#                 for v1 in v:
+#                     try:
+#                         doc = {
+#                         "term": k, 
+#                         "folderID": v1.folderID,
+#                         "docID": v1.docID,
+#                         "tf": v1.totalFreq,
+#                         "title": v1.title,
+#                         "h1":v1.h1,
+#                         "h2":v1.h2,
+#                         "h3":v1.h3,
+#                         "h4":v1.h4,
+#                         "h5":v1.h5,
+#                         "h6":v1.h6,
+#                         "strong":v1.strong,
+#                         "body":v1.body,
+#                         "url":v1.url }
+#                         docList.append(doc)
+#                     except IndexError as ie: print "IndexError:",ie
+ 
+    dic = p.parseDoc("0",2) #folder number is a string
+      
+    for k,v in dic.items():
+        for v1 in v:
+            try:
+                doc = {
+                "term": k, 
+                "folderID": v1.folderID,
+                "docID": v1.docID,
+                "tf": v1.totalFreq,
+                "title": v1.title,
+                "h1":v1.h1,
+                "h2":v1.h2,
+                "h3":v1.h3,
+                "h4":v1.h4,
+                "h5":v1.h5,
+                "h6":v1.h6,
+                "strong":v1.strong,
+                "body":v1.body,
+                "url":v1.url }
+                docList.append(doc)
+            except IndexError as ie: print "IndexError:",ie
+              
+    result = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in docList)]    
+      
     for j in result:
-#         urlStr = str(j['url'])[0:1000]
-#         if len(j['url']) < 1000:
-#             dictFile.insert(j)
-#         else:
-#             j['url'] = urlStr
-# #             print j['url'] 
-#             dictFile.insert(j)
         dictFile.insert(j)
         print j['term']
 
 driver()
-
-# p = htmlParser()
-#Tam
-# file =  p.openFile("\\Users\\Kato\\eclipse-workspace\\SearchEngine\\data.txt")
-
-# # Kelly
-# p = htmlParser()
-# file =  p.openFile("\\Users\\Kelly\\Documents\\GitHub\\cs121_project3\\WEBPAGES_RAW\\0\\2")
-#   
-# soup = BeautifulSoup(file, "html.parser")
-#     
-# print soup.findAll(text='title') 
-# # '''
-# print soup.title
-# print soup.h1
-# print soup.h2
-# print soup.h3
-# print soup.h4
-# print soup.h5
-# print soup.h6
-# print soup.b
-# print soup.p
-# # '''
