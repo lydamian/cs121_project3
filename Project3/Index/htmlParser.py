@@ -55,7 +55,11 @@ class WordFrequencyCounter:
         else:
             return False
     def checkDocNumAndFolder(self, dic , docNum, folderNum, term):
-        list = dic[term]
+        try:
+             list = dic[term]
+        except:
+            # if term is not in the dictionary error
+            return
         for item in list:
             if(item.folderID == folderNum and docNum == item.docID):
                 return item
@@ -72,7 +76,6 @@ class WordFrequencyCounter:
             frequency where it appear. That's why you see a bunch of if statements.
         '''
         word = ''
-        line += "."
         if line is None:
             return
         for char in line:
@@ -171,7 +174,11 @@ class WordFrequencyCounter:
                                 data.body += 1
                             if type1 == "g":
                                 data.totalFreq += 1
-                            dicOfTerm[word].append(data)
+                            try:
+                                 dicOfTerm[word].append(data)
+                            except:
+                                # word might not in the dictionary for some weird reason
+                                continue
                         else:
                             if type1 == "title":
                                 data.title += 1
@@ -240,7 +247,7 @@ class htmlParser():
             try:
                 if not soup.get_text is None:
                     text = soup.get_text()
-                    self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"g",url)
+                    self.wordParser.parseString( text,self.dicOfTerm,folderNum,docNum,"g",url)
                 #search title
                 la = soup.title
                 if not soup.title is None:
