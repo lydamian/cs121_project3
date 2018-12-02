@@ -147,66 +147,55 @@ class WordFrequencyCounter:
                             data = Data(folderNum,docNum)
                             data.url = url
                             #listOfTerm.append(str(word))
-                            data.totalFreq += 1
                             if type1 == "title":
                                 data.title += 1
-                                #dicOfTerm[word] = data
+                                
                             if type1 == "h1":
                                 data.h1 += 1
-                                #dicOfTerm[word] = data
+                                
                             if type1 == "h2":
                                 data.h2 += 1
-                                #dicOfTerm[word] = data
+                                
                             if type1 == "h3":
                                 data.h3 += 1
-                                #dicOfTerm[word] = data
+                                
                             if type1 == "h4":
                                 data.h4 += 1
-                                #dicOfTerm[word] = data
+                                
                             if type1 == "h5":
                                 data.h5 += 1
-                                #dicOfTerm[word] = data
+                                
                             if type1 == "h6":
                                 data.h6 += 1
-                                #dicOfTerm[word] = data
+                                
                             if type1 == "b":
                                 data.strong += 1
-                                #dicOfTerm[word] = data
+                                
                             if type1 == "p":
                                 data.body += 1
-                                #dicOfTerm[word] = data
+                                
                             if type1 == "g":
                                 data.totalFreq += 1
                             dicOfTerm[word].append(data)
                         else:
-                            data.totalFreq += 1
                             if type1 == "title":
                                 data.title += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h1":
                                 data.h1 += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h2":
                                 data.h2 += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h3":
                                 data.h3 += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h4":
                                 data.h4 += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h5":
                                 data.h5 += 1
-                                #dicOfTerm[word] = data
                             if type1 == "h6":
                                 data.h6 += 1
-                                #dicOfTerm[word] = data
                             if type1 == "b":
                                 data.strong += 1
-                                #dicOfTerm[word] = data
                             if type1 == "p":
                                 data.body += 1
-                                #dicOfTerm[word] = data
                             if type1 == "g":
                                 data.totalFreq += 1
                 word=''
