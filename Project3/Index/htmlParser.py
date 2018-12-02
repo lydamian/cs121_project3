@@ -299,12 +299,6 @@ def driver():
 
         for k,v in dic.items():
             for v1 in v:
-#                 try:
-#                     if len(v1.url)>1000:
-#                         v1.url = None
-#                 except: 
-#                     print "url too long: folderID=" + str(v1.folderID) + ", docID=" + str(v1.docID)
-
                 try:
                     doc = {
                     "term": k, 
@@ -325,17 +319,17 @@ def driver():
                 except IndexError as ie: print "IndexError:",ie
             
     result = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in docList)]
-
-    
     
     for j in result:
-        urlStr = str(j['url'])[0:1000]
-        if len(j['url']) < 1000:
-            dictFile.insert(j)
-        else:
-            j['url'] = urlStr
-#             print j['url'] 
-            dictFile.insert(j)
+#         urlStr = str(j['url'])[0:1000]
+#         if len(j['url']) < 1000:
+#             dictFile.insert(j)
+#         else:
+#             j['url'] = urlStr
+# #             print j['url'] 
+#             dictFile.insert(j)
+
+        dictFile.insert(j)
         print j['term']
 
 driver()
