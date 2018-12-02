@@ -72,9 +72,10 @@ class WordFrequencyCounter:
             frequency where it appear. That's why you see a bunch of if statements.
         '''
         word = ''
-        line += "."
+        
         if line is None:
             return
+        line += "."
         for char in line:
             if(char.isalnum()):
                 if(char.isupper()):
