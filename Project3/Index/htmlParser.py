@@ -1,6 +1,6 @@
 '''
 Created on Nov 15, 2018
-
+ 
 @author: Kato
 '''
 import os
@@ -14,12 +14,12 @@ from nltk.parse.chart import AbstractChartRule
 from pymongo import MongoClient
 import re
 from numpy.lib.utils import _dictlist
-
+ 
 dirPath= "\\Users\\Kelly\\Documents\\GitHub\\cs121_project3\\WEBPAGES_RAW"
 bookeepingPath = "\\Users\\Kelly\\Documents\\GitHub\\cs121_project3\\WEBPAGES_RAW\\bookkeeping.json"
-
+ 
 class Data():
-    
+     
     folderID = -1
     docID = -1
     totalFreq = 0
@@ -39,7 +39,7 @@ class Data():
     def __init__(self, _folderID, _docID):
         self.docID = _docID
         self.folderID = _folderID
-
+ 
 class WordFrequencyCounter:
     '''
         This is a helper function to check if a term is in a dictionary.
@@ -55,9 +55,9 @@ class WordFrequencyCounter:
         for item in list:
             if(item.folderID == folderNum and docNum == item.docID):
                 return item
- 
+  
         return None      
-        
+         
     def lemmatizer(self, word):
         lmt = WordNetLemmatizer()
         word = lmt.lemmatize(word)
@@ -78,8 +78,8 @@ class WordFrequencyCounter:
                 word += char
             else:
                 if not (word == ''):
+                    word = self.lemmatizer(word)
                     if not self.isKeyInDictionary(dicOfTerm, word):
-                        word = self.lemmatizer(word)
                         key = str(folderNum) + '\\' + str(docNum)
                         data = Data(folderNum,docNum)
                         data.url = url
@@ -210,17 +210,17 @@ class WordFrequencyCounter:
                             if type1 == "g":
                                 data.totalFreq += 1
                 word=''
-
+ 
 class htmlParser():
     '''
         THIS FUNCTION IS THE MAIN DRIVER. IT USED OTHER CLASSES AND function to help
         parse html files
-        
+         
     '''
     totalFolder = 0
     dicOfTerm = { }
     wordParser = WordFrequencyCounter()
-
+ 
     def __init__(self):
         self.totalFolder = self.directorySize(dirPath)
         self.wordParser = WordFrequencyCounter()
@@ -244,7 +244,7 @@ class htmlParser():
             bookeeping  = self.readBookKeeping()
             folderPath = dirPath + "\\" + str(folderNum )
             size = self.directorySize(folderPath)
-
+ 
             docPath =  str(folderPath) + '\\' + str(docNum)
             htmlDoc = self.openFile(docPath)
             soup = BeautifulSoup(htmlDoc,"html.parser")
@@ -255,7 +255,7 @@ class htmlParser():
             try:
                 if not soup.get_text() is None:
                     text = soup.get_text()
-                    self.wordParser.parseString( text.strip(),self.dicOfTerm,folderNum,docNum,"g",url)
+                    self.wordParser.parseString(text.strip(),self.dicOfTerm,folderNum,docNum,"g",url)
                 #search title
                 la = soup.title
                 if not soup.title is None:
@@ -298,17 +298,17 @@ class htmlParser():
                 a = 0
             htmlDoc.close()
             return self.dicOfTerm
-
-
+ 
+ 
 def driver():
     p = htmlParser()
     ##inserts lines from file into document inside DB called searchEngine
     client = MongoClient()
     db = client.searchEngine
     dictFile = db.dictFile
-     
+      
     docList=[]
-     
+      
 #     for folderNum in range(0,2): #TODO: change number of folders
 #         for docNum in range(0,5): #TODO: change number of docs in folder
 #             dic = p.parseDoc(str(folderNum),docNum) #folder number is a string
@@ -333,9 +333,9 @@ def driver():
 #                         "url":v1.url }
 #                         docList.append(doc)
 #                     except IndexError as ie: print "IndexError:",ie
-
+ 
     dic = p.parseDoc("0",2) #folder number is a string
-     
+      
     for k,v in dic.items():
         for v1 in v:
             try:
@@ -356,21 +356,21 @@ def driver():
                 "url":v1.url }
                 docList.append(doc)
             except IndexError as ie: print "IndexError:",ie
-             
+              
     result = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in docList)]    
-     
+      
     for j in result:
         dictFile.insert(j)
         print j['term']
- 
+  
 driver()
 
 
-# NEW: not working
-# 
+#NEW
+ 
 # '''
 # Created on Nov 15, 2018
-# 
+#  
 # @author: Kato
 # '''
 # import os
@@ -387,13 +387,13 @@ driver()
 # #Tam
 # # dirPath = "\\Users\\Kato\\eclipse-workspace\\SearchEngine\\WEBPAGES_RAW" 
 # # bookeepingPath = "\\Users\\Kato\\Downloads\\WEBPAGES_RAW\\bookkeeping.json"
-# 
+#  
 # #Kelly
 # dirPath= "\\Users\\Kelly\\Documents\\GitHub\\cs121_project3\\WEBPAGES_RAW"
 # bookeepingPath = "\\Users\\Kelly\\Documents\\GitHub\\cs121_project3\\WEBPAGES_RAW\\bookkeeping.json"
-# 
+#  
 # class Data():
-#     
+#      
 #     folderID = -1
 #     docID = -1
 #     totalFreq = 0
@@ -413,7 +413,7 @@ driver()
 #     def __init__(self, _folderID, _docID):
 #         self.docID = _docID
 #         self.folderID = _folderID
-# 
+#  
 # class WordFrequencyCounter:
 #     '''
 #         This is a helper function to check if a term is in a dictionary.
@@ -429,9 +429,9 @@ driver()
 #         for item in list:
 #             if(item.folderID == folderNum and docNum == item.docID):
 #                 return item
-#  
+#   
 #         return None      
-#         
+#          
 #     def lemmatizer(self, word):
 #         lmt = WordNetLemmatizer()
 #         word = lmt.lemmatize(word)
@@ -442,7 +442,7 @@ driver()
 #             frequency where it appear. That's why you see a bunch of if statements.
 #         '''
 #         word = ''
-#         
+#          
 #         if line is None:
 #             return
 #         line += "."
@@ -515,7 +515,7 @@ driver()
 #                             list1 = []
 #                             list1.append(data)
 #                             dicOfTerm.update({ str(word): list1 }) 
-#                         
+#                          
 #                     else:
 #                         word = self.lemmatizer(word)
 #                         data = self.checkDocNumAndFolder(dicOfTerm, docNum, folderNum, word) 
@@ -564,19 +564,19 @@ driver()
 #                                 data.body += 1
 #                             if type1 == "g":
 #                                 data.totalFreq += 1
-#                         
+#                          
 #                 word=''
-# 
+#  
 # class htmlParser():
 #     '''
 #         THIS FUNCTION IS THE MAIN DRIVER. IT USED OTHER CLASSES AND function to help
 #         parse html files
-#         
+#          
 #     '''
 #     totalFolder = 0
 #     dicOfTerm = { }
 #     wordParser = WordFrequencyCounter()
-# 
+#  
 #     def __init__(self):
 #         self.totalFolder = self.directorySize(dirPath)
 #         self.wordParser = WordFrequencyCounter()
@@ -600,7 +600,7 @@ driver()
 #             bookeeping  = self.readBookKeeping()
 #             folderPath = dirPath + "\\" + str(folderNum )
 #             size = self.directorySize(folderPath)
-# 
+#  
 #             docPath =  str(folderPath) + '\\' + str(docNum)
 #             htmlDoc = self.openFile(docPath)
 #             soup = BeautifulSoup(htmlDoc,"html.parser")
@@ -609,9 +609,9 @@ driver()
 #             key = str(folderNum) + '/' + str(docNum)
 #             url = str(bookeeping.get(key))
 #             try:
-#                 if not soup.get_text is None:
+#                 if not soup.get_text() is None:
 #                     text = soup.get_text()
-#                     self.wordParser.parseString( text.text.strip(),self.dicOfTerm,folderNum,docNum,"g",url)
+#                     self.wordParser.parseString(text.strip(),self.dicOfTerm,folderNum,docNum,"g",url)
 #                 #search title
 #                 la = soup.title
 #                 if not soup.title is None:
@@ -654,57 +654,71 @@ driver()
 #                 a = 0
 #             htmlDoc.close()
 #             return self.dicOfTerm
-#         
+#          
 # def driver():
 #     p = htmlParser()
 #     ##inserts lines from file into document inside DB called searchEngine
 #     client = MongoClient()
 #     db = client.searchEngine
 #     dictFile = db.dictFile
-#     
+#      
 #     #test dictionary
 #     print "connection established"
 #     dic = p.parseDoc("0",2)
-#     print dic
-#     
+# 
 #     docList=[]
 #     
-#     for folderNum in range(0,2): #TODO: change number of folders
-#         for docNum in range(0,5): #TODO: change number of docs in folder
-#             dic = p.parseDoc(str(folderNum),docNum) #folder number is a string
-#     
-#             for k,v in dic.items():
-#                 for v1 in v:
-#                     try:
-#                         doc = {
-#                         "term": k, 
-#                         "folderID": v1.folderID,
-#                         "docID": v1.docID,
-#                         "tf": v1.totalFreq,
-#                         "title": v1.title,
-#                         "h1":v1.h1,
-#                         "h2":v1.h2,
-#                         "h3":v1.h3,
-#                         "h4":v1.h4,
-#                         "h5":v1.h5,
-#                         "h6":v1.h6,
-#                         "strong":v1.strong,
-#                         "body":v1.body,
-#                         "url":v1.url }
-#                         docList.append(doc)
-#                     except IndexError as ie: print "IndexError:",ie
-#             
+#     for k,v in dic.items():
+#         for v1 in v:
+#             try:
+#                 doc = {
+#                 "term": k, 
+#                 "folderID": v1.folderID,
+#                 "docID": v1.docID,
+#                 "tf": v1.totalFreq,
+#                 "title": v1.title,
+#                 "h1":v1.h1,
+#                 "h2":v1.h2,
+#                 "h3":v1.h3,
+#                 "h4":v1.h4,
+#                 "h5":v1.h5,
+#                 "h6":v1.h6,
+#                 "strong":v1.strong,
+#                 "body":v1.body,
+#                 "url":v1.url }
+#                 docList.append(doc)
+#             except IndexError as ie: print "IndexError:",ie
+#      
+#      
+# #     for folderNum in range(0,2): #TODO: change number of folders
+# #         for docNum in range(0,5): #TODO: change number of docs in folder
+# #             dic = p.parseDoc(str(folderNum),docNum) #folder number is a string
+# #      
+# #             for k,v in dic.items():
+# #                 for v1 in v:
+# #                     try:
+# #                         doc = {
+# #                         "term": k, 
+# #                         "folderID": v1.folderID,
+# #                         "docID": v1.docID,
+# #                         "tf": v1.totalFreq,
+# #                         "title": v1.title,
+# #                         "h1":v1.h1,
+# #                         "h2":v1.h2,
+# #                         "h3":v1.h3,
+# #                         "h4":v1.h4,
+# #                         "h5":v1.h5,
+# #                         "h6":v1.h6,
+# #                         "strong":v1.strong,
+# #                         "body":v1.body,
+# #                         "url":v1.url }
+# #                         docList.append(doc)
+# #                     except IndexError as ie: print "IndexError:",ie
+#              
 #     result = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in docList)]    
-#     
+#      
 #     for j in result:
-# #         urlStr = str(j['url'])[0:1000]
-# #         if len(j['url']) < 1000:
-# #             dictFile.insert(j)
-# #         else:
-# #             j['url'] = urlStr
-# # #             print j['url'] 
-# #             dictFile.insert(j)
 #         dictFile.insert(j)
 #         print j['term']
-# 
+#  
 # driver()
