@@ -76,10 +76,6 @@ class WordFrequencyCounter:
             frequency where it appear. That's why you see a bunch of if statements.
         '''
         word = ''
-<<<<<<< HEAD
-=======
-        
->>>>>>> 2565b558f3827a71d039e613734f630655d94342
         if line is None:
             return
         line += "."
@@ -252,11 +248,7 @@ class htmlParser():
             try:
                 if not soup.get_text() is None:
                     text = soup.get_text()
-<<<<<<< HEAD
                     self.wordParser.parseString( text,self.dicOfTerm,folderNum,docNum,"g",url)
-=======
-                    self.wordParser.parseString(text.strip(),self.dicOfTerm,folderNum,docNum,"g",url)
->>>>>>> 2565b558f3827a71d039e613734f630655d94342
                 #search title
                 la = soup.title
                 if not soup.title is None:
@@ -309,58 +301,67 @@ def driver():
     
     docList=[]
     
-#     for folderNum in range(0,2): #TODO: change number of folders
-#         for docNum in range(0,5): #TODO: change number of docs in folder
-#             dic = p.parseDoc(str(folderNum),docNum) #folder number is a string
-#      
-#             for k,v in dic.items():
-#                 for v1 in v:
-#                     try:
-#                         doc = {
-#                         "term": k, 
-#                         "folderID": v1.folderID,
-#                         "docID": v1.docID,
-#                         "tf": v1.totalFreq,
-#                         "title": v1.title,
-#                         "h1":v1.h1,
-#                         "h2":v1.h2,
-#                         "h3":v1.h3,
-#                         "h4":v1.h4,
-#                         "h5":v1.h5,
-#                         "h6":v1.h6,
-#                         "strong":v1.strong,
-#                         "body":v1.body,
-#                         "url":v1.url }
-#                         docList.append(doc)
-#                     except IndexError as ie: print "IndexError:",ie
+#     for folderNum in range(0,1): #TODO: change number of folders
+    folderNum = 0
+    for docNum in range(0,500): #TODO: change number of docs in folder
+        dic = p.parseDoc(str(folderNum),docNum) #folder number is a string
+        for k,v in dic.items():
+            for v1 in v:
+                try:
+                    doc = {
+                    "term": k, 
+                    "folderID": v1.folderID,
+                    "docID": v1.docID,
+                    "tf": v1.totalFreq,
+                    "title": v1.title,
+                    "h1":v1.h1,
+                    "h2":v1.h2,
+                    "h3":v1.h3,
+                    "h4":v1.h4,
+                    "h5":v1.h5,
+                    "h6":v1.h6,
+                    "strong":v1.strong,
+                    "body":v1.body,
+                    "url":v1.url }
+                    docList.append(doc)
+                except IndexError as ie: print "IndexError:",ie
  
-    dic = p.parseDoc("0",2) #folder number is a string
-      
-    for k,v in dic.items():
-        for v1 in v:
-            try:
-                doc = {
-                "term": k, 
-                "folderID": v1.folderID,
-                "docID": v1.docID,
-                "tf": v1.totalFreq,
-                "title": v1.title,
-                "h1":v1.h1,
-                "h2":v1.h2,
-                "h3":v1.h3,
-                "h4":v1.h4,
-                "h5":v1.h5,
-                "h6":v1.h6,
-                "strong":v1.strong,
-                "body":v1.body,
-                "url":v1.url }
-                docList.append(doc)
-            except IndexError as ie: print "IndexError:",ie
+## TESTING ONE DOCUMENT
+#     dic = p.parseDoc("0",2) #folder number is a string
+#       
+#     for k,v in dic.items():
+#         for v1 in v:
+#             try:
+#                 doc = {
+#                 "term": k, 
+#                 "folderID": v1.folderID,
+#                 "docID": v1.docID,
+#                 "tf": v1.totalFreq,
+#                 "title": v1.title,
+#                 "h1":v1.h1,
+#                 "h2":v1.h2,
+#                 "h3":v1.h3,
+#                 "h4":v1.h4,
+#                 "h5":v1.h5,
+#                 "h6":v1.h6,
+#                 "strong":v1.strong,
+#                 "body":v1.body,
+#                 "url":v1.url }
+#                 docList.append(doc)
+#             except IndexError as ie: print "IndexError:",ie
               
     result = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in docList)]    
       
     for j in result:
-        dictFile.insert(j)
-        print j['term']
+        urlStr = str(j['url'])[0:1000]
+        if len(j['url']) < 1000:
+            dictFile.insert(j)
+        else:
+            j['url'] = urlStr
+            dictFile.insert(j)
+#     for j in result:
+#         dictFile.insert(j)
+# #         print j['term']
+    print "finished folder,doc: " + folderNum + "/" + str(docNum)
 
 driver()
