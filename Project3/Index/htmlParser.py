@@ -301,9 +301,11 @@ def driver():
     
     docList=[]
     
-#     for folderNum in range(0,1): #TODO: change number of folders
+#   #TODO: change folder number
     folderNum = 0
     for docNum in range(0,500): #TODO: change number of docs in folder
+#     for docNum in range(0,250):
+#     for docNum in range(250,500):
         dic = p.parseDoc(str(folderNum),docNum) #folder number is a string
         for k,v in dic.items():
             for v1 in v:
